@@ -12,6 +12,7 @@ class _CreateStudentState extends State<CreateStudent> {
   final _nameController = TextEditingController();
   final _courseController = TextEditingController();
   final _studentNoController = TextEditingController();
+  final _yearNoController = TextEditingController();
 
   Future<void> _saveStudent() async {
     if (_nameController.text.isEmpty || _courseController.text.isEmpty) return;
@@ -20,6 +21,7 @@ class _CreateStudentState extends State<CreateStudent> {
       'student_no': _studentNoController.text.trim(),
       'name': _nameController.text.trim(),
       'course': _courseController.text.trim(),
+      'year': _yearNoController.text.trim(),
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -56,7 +58,7 @@ class _CreateStudentState extends State<CreateStudent> {
                     TextField(
                       controller: _studentNoController,
                       decoration: InputDecoration(
-                        labelText: 'Student No',
+                        labelText: 'Student Number',
                         prefixIcon: const Icon(Icons.badge_outlined, color: Color.fromARGB(255, 33, 150, 243)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
@@ -84,7 +86,21 @@ class _CreateStudentState extends State<CreateStudent> {
                     TextField(
                       controller: _courseController,
                       decoration: InputDecoration(
-                        labelText: 'Course / Year',
+                        labelText: 'Course',
+                        prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 150, 243)),
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _yearNoController,
+                      decoration: InputDecoration(
+                        labelText: 'Year',
                         prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 150, 243)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
