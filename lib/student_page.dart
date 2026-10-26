@@ -129,7 +129,6 @@ class _StudentPageState extends State<StudentPage> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   CircleAvatar(
                                     radius: 26,
                                     backgroundColor: const Color(0xFFE3F0FF),
@@ -144,7 +143,6 @@ class _StudentPageState extends State<StudentPage> {
                                   ),
 
                                   const SizedBox(width: 14),
-
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -246,4 +244,3 @@ class _StudentPageState extends State<StudentPage> {
     );
   }
 }
-
