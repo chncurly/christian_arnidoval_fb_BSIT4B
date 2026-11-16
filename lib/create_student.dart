@@ -33,10 +33,10 @@ class _CreateStudentState extends State<CreateStudent> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F9), // Clean light grey-blue background
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 33, 150, 243),
+        backgroundColor: const Color.fromARGB(255, 33, 243, 173),
         foregroundColor: Colors.white,
         title: const Text(
-          'Create Student',
+          'Enroll Student',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
@@ -59,7 +59,7 @@ class _CreateStudentState extends State<CreateStudent> {
                       controller: _studentNoController,
                       decoration: InputDecoration(
                         labelText: 'Student Number',
-                        prefixIcon: const Icon(Icons.badge_outlined, color: Color.fromARGB(255, 33, 150, 243)),
+                        prefixIcon: const Icon(Icons.badge_outlined, color: Color.fromARGB(255, 33, 243, 173)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
@@ -73,7 +73,7 @@ class _CreateStudentState extends State<CreateStudent> {
                       controller: _nameController,
                       decoration: InputDecoration(
                         labelText: 'Full Name',
-                        prefixIcon: const Icon(Icons.person_outline, color: Color.fromARGB(255, 33, 150, 243)),
+                        prefixIcon: const Icon(Icons.person_outline, color: Color.fromARGB(255, 33, 243, 173)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
@@ -87,7 +87,7 @@ class _CreateStudentState extends State<CreateStudent> {
                       controller: _courseController,
                       decoration: InputDecoration(
                         labelText: 'Course',
-                        prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 150, 243)),
+                        prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 243, 173)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
@@ -101,7 +101,7 @@ class _CreateStudentState extends State<CreateStudent> {
                       controller: _yearNoController,
                       decoration: InputDecoration(
                         labelText: 'Year',
-                        prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 150, 243)),
+                        prefixIcon: const Icon(Icons.school_outlined, color: Color.fromARGB(255, 33, 243, 173)),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
@@ -121,7 +121,7 @@ class _CreateStudentState extends State<CreateStudent> {
               child: ElevatedButton(
                 onPressed: _saveStudent,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 33, 150, 243),
+                  backgroundColor: const Color.fromARGB(255, 33, 243, 173),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
