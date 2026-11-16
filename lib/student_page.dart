@@ -1,6 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'create_student.dart';
+import 'login_page.dart';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -23,10 +27,74 @@ class _StudentPageState extends State<StudentPage> {
   @override
   void initState() {
     super.initState();
-
-    // Create the Firestore stream only once.
     studentStream = students.snapshots();
   }
+
+  // =========================
+  // LOGOUT FUNCTION
+  // =========================
+
+  Future<void> logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text(
+            'Are you sure you want to logout?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Yes, Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true || !mounted) return;
+
+    try {
+      await FirebaseAuth.instance.signOut();
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+        (route) => false,
+      );
+
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // =========================
+  // DELETE STUDENT
+  // =========================
 
   Future<void> deleteStudent(String documentId) async {
     try {
@@ -71,7 +139,7 @@ class _StudentPageState extends State<StudentPage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                deleteStudent(documentId,);
+                deleteStudent(documentId);
               },
               child: const Text(
                 'Delete',
@@ -83,6 +151,10 @@ class _StudentPageState extends State<StudentPage> {
       },
     );
   }
+
+  // =========================
+  // SEARCH BAR
+  // =========================
 
   Widget buildSearchBar() {
     return Container(
@@ -125,6 +197,10 @@ class _StudentPageState extends State<StudentPage> {
       ),
     );
   }
+
+  // =========================
+  // STATISTICS CARD
+  // =========================
 
   Widget buildStatCard(
     String title,
@@ -183,6 +259,10 @@ class _StudentPageState extends State<StudentPage> {
       ),
     );
   }
+
+  // =========================
+  // COURSE STATISTICS
+  // =========================
 
   Widget buildCourseStatistics(
     List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
@@ -260,13 +340,18 @@ class _StudentPageState extends State<StudentPage> {
     );
   }
 
+  // =========================
+  // STUDENT CARD
+  // =========================
+
   Widget buildStudentCard(
     QueryDocumentSnapshot<Map<String, dynamic>> document,
   ) {
     final data = document.data();
 
     final name = (data['name'] ?? 'Unknown Student').toString();
-    final studentNo = (data['student_no'] ?? 'No Student Number').toString();
+    final studentNo =
+        (data['student_no'] ?? 'No Student Number').toString();
     final course = (data['course'] ?? 'No Course').toString();
 
     final initials = name.trim().isEmpty
@@ -345,6 +430,10 @@ class _StudentPageState extends State<StudentPage> {
     );
   }
 
+  // =========================
+  // MAIN DASHBOARD
+  // =========================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -386,42 +475,79 @@ class _StudentPageState extends State<StudentPage> {
             }).toList();
 
             // Count unique courses.
-            final courses = documents
-                .map((document) {
-                  final course = (document.data()['course'] ?? '')
-                      .toString()
-                      .trim();
+            final courses = documents.map((document) {
+              final course = (document.data()['course'] ?? '')
+                  .toString()
+                  .trim();
 
-                  return course.isEmpty
-                      ? 'Unspecified Course'
-                      : course;
-                })
-                .toSet();
+              return course.isEmpty
+                  ? 'Unspecified Course'
+                  : course;
+            }).toSet();
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Student Dashboard',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                    ),
+
+                  // DASHBOARD HEADER WITH LOGOUT
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Student Dashboard',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Manage your student records',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF94A3B8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      ElevatedButton.icon(
+                        onPressed: logout,
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          size: 18,
+                        ),
+                        label: const Text('Logout'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Manage your student records',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF94A3B8),
-                    ),
-                  ),
+
                   const SizedBox(height: 22),
 
-                  // Dashboard statistics.
+                  // DASHBOARD STATISTICS
                   Row(
                     children: [
                       buildStatCard(
@@ -442,7 +568,7 @@ class _StudentPageState extends State<StudentPage> {
 
                   const SizedBox(height: 25),
 
-                  // Course statistics.
+                  // COURSE STATISTICS
                   const Text(
                     'Course Enrollment',
                     style: TextStyle(
@@ -451,6 +577,7 @@ class _StudentPageState extends State<StudentPage> {
                       color: Color(0xFF1E293B),
                     ),
                   ),
+
                   const SizedBox(height: 14),
 
                   Container(
@@ -465,7 +592,7 @@ class _StudentPageState extends State<StudentPage> {
 
                   const SizedBox(height: 25),
 
-                  // Student list header.
+                  // STUDENT LIST HEADER
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -477,6 +604,7 @@ class _StudentPageState extends State<StudentPage> {
                           color: Color(0xFF1E293B),
                         ),
                       ),
+
                       ElevatedButton.icon(
                         onPressed: () {
                           Navigator.push(
@@ -486,7 +614,10 @@ class _StudentPageState extends State<StudentPage> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.add, size: 18),
+                        icon: const Icon(
+                          Icons.add,
+                          size: 18,
+                        ),
                         label: const Text('Add Student'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -502,12 +633,12 @@ class _StudentPageState extends State<StudentPage> {
 
                   const SizedBox(height: 15),
 
-                  // Search bar.
+                  // SEARCH BAR
                   buildSearchBar(),
 
                   const SizedBox(height: 18),
 
-                  // Student records.
+                  // STUDENT RECORDS
                   if (documents.isEmpty)
                     const Center(
                       child: Padding(

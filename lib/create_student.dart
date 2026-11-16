@@ -36,7 +36,7 @@ class _CreateStudentState extends State<CreateStudent> {
         backgroundColor: const Color.fromARGB(255, 33, 243, 173),
         foregroundColor: Colors.white,
         title: const Text(
-          'Enroll Student',
+          'Create Student',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
