@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -76,10 +75,7 @@ class _CreateStudentState extends State<CreateStudent> {
   }) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(
-        icon,
-        color: const Color.fromARGB(255, 33, 243, 173),
-      ),
+      prefixIcon: Icon(icon, color: const Color.fromARGB(255, 33, 243, 173)),
       filled: true,
       fillColor: const Color(0xFFF8FAFC),
       border: OutlineInputBorder(

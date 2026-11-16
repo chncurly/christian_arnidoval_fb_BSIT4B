@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'student_page.dart'; 
+import 'student_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -49,10 +49,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.redAccent,
-          ),
+          SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
         );
       }
     } finally {
@@ -115,16 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Color(0xFF1E293B),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Sign in to manage student records',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blueGrey,
-                        ),
-                      ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 10),
 
                       // Email Field
                       TextFormField(
