@@ -30,9 +30,13 @@ class _StudentPageState extends State<StudentPage> {
     studentStream = students.snapshots();
   }
 
-  // =========================
-  // LOGOUT FUNCTION
-  // =========================
+  String getYearLevel(Map<String, dynamic> data) {
+    final year = (
+      data['year_level'] ?? data['yearLevel'] ?? ''
+    ).toString().trim();
+
+    return year.isEmpty ? 'Unspecified Year Level' : year;
+  }
 
   Future<void> logout() async {
     final confirm = await showDialog<bool>(
@@ -79,7 +83,6 @@ class _StudentPageState extends State<StudentPage> {
         ),
         (route) => false,
       );
-
     } catch (e) {
       if (!mounted) return;
 
@@ -173,7 +176,7 @@ class _StudentPageState extends State<StudentPage> {
           });
         },
         decoration: InputDecoration(
-          hintText: 'Search student name or number...',
+          hintText: 'Search student name, number or year...',
           hintStyle: const TextStyle(
             fontSize: 13,
             color: Color(0xFF94A3B8),
@@ -290,9 +293,7 @@ class _StudentPageState extends State<StudentPage> {
 
     return Column(
       children: courseCounts.entries.map((entry) {
-        final percentage = documents.isEmpty
-            ? 0.0
-            : entry.value / documents.length;
+        final percentage = entry.value / documents.length;
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -341,6 +342,112 @@ class _StudentPageState extends State<StudentPage> {
   }
 
   // =========================
+  // YEAR LEVEL STATISTICS
+  // =========================
+
+  Widget buildYearLevelStatistics(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
+  ) {
+    final Map<String, int> yearCounts = {};
+
+    for (final document in documents) {
+      final year = getYearLevel(document.data());
+
+      yearCounts[year] = (yearCounts[year] ?? 0) + 1;
+    }
+
+    const yearOrder = [
+      '1st Year',
+      '2nd Year',
+      '3rd Year',
+      '4th Year',
+      '5th Year',
+    ];
+
+    final sortedYears = <String, int>{};
+
+    for (final year in yearOrder) {
+      if (yearCounts.containsKey(year)) {
+        sortedYears[year] = yearCounts[year]!;
+      }
+    }
+
+    // Include other year-level labels and unspecified records.
+    for (final entry in yearCounts.entries) {
+      if (!sortedYears.containsKey(entry.key)) {
+        sortedYears[entry.key] = entry.value;
+      }
+    }
+
+    const yearColors = [
+      Colors.blue,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+    ];
+
+    if (sortedYears.isEmpty) {
+      return const Text(
+        'No year level records available.',
+        style: TextStyle(color: Colors.grey),
+      );
+    }
+
+    return Column(
+      children: sortedYears.entries.toList().asMap().entries.map((item) {
+        final index = item.key;
+        final entry = item.value;
+
+        final percentage = entry.value / documents.length;
+
+        final color = yearColors[index % yearColors.length];
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      entry.key,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Color(0xFF334155),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${entry.value} Students',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: percentage,
+                  minHeight: 8,
+                  backgroundColor: const Color(0xFFE8EDF4),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // =========================
   // STUDENT CARD
   // =========================
 
@@ -350,9 +457,13 @@ class _StudentPageState extends State<StudentPage> {
     final data = document.data();
 
     final name = (data['name'] ?? 'Unknown Student').toString();
+
     final studentNo =
         (data['student_no'] ?? 'No Student Number').toString();
+
     final course = (data['course'] ?? 'No Course').toString();
+
+    final yearLevel = getYearLevel(data);
 
     final initials = name.trim().isEmpty
         ? '?'
@@ -383,7 +494,9 @@ class _StudentPageState extends State<StudentPage> {
               ),
             ),
           ),
+
           const SizedBox(width: 13),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +509,9 @@ class _StudentPageState extends State<StudentPage> {
                     color: Color(0xFF1E293B),
                   ),
                 ),
+
                 const SizedBox(height: 5),
+
                 Text(
                   studentNo,
                   style: const TextStyle(
@@ -404,7 +519,9 @@ class _StudentPageState extends State<StudentPage> {
                     color: Color(0xFF64748B),
                   ),
                 ),
+
                 const SizedBox(height: 3),
+
                 Text(
                   course,
                   style: const TextStyle(
@@ -412,9 +529,32 @@ class _StudentPageState extends State<StudentPage> {
                     color: Color(0xFF94A3B8),
                   ),
                 ),
+
+                const SizedBox(height: 7),
+
+                // YEAR LEVEL LABEL
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.09),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    yearLevel,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
+
           IconButton(
             onPressed: () {
               confirmDeleteStudent(document.id, name);
@@ -458,7 +598,7 @@ class _StudentPageState extends State<StudentPage> {
 
             final documents = snapshot.data?.docs ?? [];
 
-            // Search by student name or student number.
+            // SEARCH BY NAME, STUDENT NUMBER, OR YEAR LEVEL
             final query = searchQuery.trim().toLowerCase();
 
             final filteredDocuments = documents.where((document) {
@@ -470,11 +610,15 @@ class _StudentPageState extends State<StudentPage> {
               final studentNo =
                   (data['student_no'] ?? '').toString().toLowerCase();
 
+              final yearLevel =
+                  getYearLevel(data).toLowerCase();
+
               return name.contains(query) ||
-                  studentNo.contains(query);
+                  studentNo.contains(query) ||
+                  yearLevel.contains(query);
             }).toList();
 
-            // Count unique courses.
+            // COUNT UNIQUE COURSES
             final courses = documents.map((document) {
               final course = (document.data()['course'] ?? '')
                   .toString()
@@ -563,31 +707,14 @@ class _StudentPageState extends State<StudentPage> {
                         Icons.menu_book_rounded,
                         Colors.blue,
                       ),
+                      const SizedBox(width: 12),
+                      buildStatCard(
+                        'Year Level',
+                        courses.length.toString(),
+                        Icons.calendar_month_outlined,
+                        Colors.blue,
+                      ),
                     ],
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // COURSE STATISTICS
-                  const Text(
-                    'Course Enrollment',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: buildCourseStatistics(documents),
                   ),
 
                   const SizedBox(height: 25),
