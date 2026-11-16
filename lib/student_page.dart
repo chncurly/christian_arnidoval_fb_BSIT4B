@@ -707,13 +707,6 @@ class _StudentPageState extends State<StudentPage> {
                         Icons.menu_book_rounded,
                         Colors.blue,
                       ),
-                      const SizedBox(width: 12),
-                      buildStatCard(
-                        'Year Level',
-                        courses.length.toString(),
-                        Icons.calendar_month_outlined,
-                        Colors.blue,
-                      ),
                     ],
                   ),
 
