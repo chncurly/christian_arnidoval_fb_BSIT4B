@@ -116,7 +116,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      
+                      const Text(
+                        'Sign in to manage student records',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
                       const SizedBox(height: 28),
 
                       // Email Field
